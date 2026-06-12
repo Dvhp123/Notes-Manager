@@ -1,0 +1,12 @@
+{
+  "name": "notes-manager-root",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "npm start --prefix notes-manager/backend",
+    "start:frontend": "npm start --prefix notes-manager/frontend"
+  },
+  "dependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

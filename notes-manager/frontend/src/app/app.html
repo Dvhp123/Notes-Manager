@@ -1,0 +1,117 @@
+<div class="admin-dashboard">
+  <!-- Login Overlay -->
+  <div *ngIf="!isLoggedIn" class="login-container">
+    <div class="login-card glass slide-in">
+      <div class="logo">
+        <span class="icon">🔐</span>
+        <h1>Admin Login</h1>
+      </div>
+      <form (ngSubmit)="login()" #loginForm="ngForm">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" [(ngModel)]="credentials.username" required placeholder="admin">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" [(ngModel)]="credentials.password" required placeholder="admin123">
+        </div>
+        <button type="submit" class="btn-primary" [disabled]="!loginForm.form.valid">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main Content (Only if Logged In) -->
+  <ng-container *ngIf="isLoggedIn">
+    <header class="dashboard-header">
+      <div class="header-main">
+        <div class="logo">
+          <span class="icon">📝</span>
+          <h1>Admin Dashboard</h1>
+        </div>
+        <button class="btn-logout" (click)="logout()">Logout</button>
+      </div>
+      <p class="subtitle">Notes Manager & Activity Tracker</p>
+    </header>
+
+    <main class="dashboard-content">
+      <section class="notes-section">
+        <div class="card glass">
+          <h2>Add New Note</h2>
+          <form (ngSubmit)="addNote()" #noteForm="ngForm" class="add-note-form">
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" name="title" [(ngModel)]="newNote.title" required placeholder="Enter note title...">
+            </div>
+            <div class="form-group">
+              <label>Content</label>
+              <textarea name="content" [(ngModel)]="newNote.content" required placeholder="Write your note here..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary" [disabled]="!noteForm.form.valid">Add Note</button>
+          </form>
+        </div>
+
+        <div class="notes-grid">
+          <div *ngFor="let note of notes" class="note-card glass slide-in">
+            <div class="note-header">
+              <h3>{{ note.title }}</h3>
+              <div class="actions">
+                <button class="btn-icon edit" (click)="startEdit(note)" title="Edit Note">
+                  <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M20.71,7.04C21.1,6.65 21.1,6.02 20.71,5.63L18.37,3.29C17.98,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" /></svg>
+                </button>
+                <button class="btn-icon delete" (click)="deleteNote(note._id!)" title="Delete Note">
+                  <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19V4M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></svg>
+                </button>
+              </div>
+            </div>
+            <p class="note-content">{{ note.content }}</p>
+            <div class="note-footer">
+              <span class="note-date">{{ note.createdAt | date:'short' }}</span>
+            </div>
+          </div>
+          <div *ngIf="notes.length === 0" class="empty-state glass">No notes found.</div>
+        </div>
+      </section>
+
+      <section class="activity-section">
+        <div class="card glass">
+          <div class="section-header">
+            <h2>Recent Activity</h2>
+            <span class="badge">{{ activities.length }} logs</span>
+          </div>
+          <div class="activity-list">
+            <div *ngFor="let activity of activities" class="activity-item">
+              <div class="activity-icon" [ngClass]="activity.actionType.toLowerCase().replace(' ', '-')">
+                <span>{{ activity.actionType === 'Note Deleted' ? '-' : '+' }}</span>
+              </div>
+              <div class="activity-info">
+                <p class="activity-text"><span class="action">{{ activity.actionType }}</span>: <i>"{{ activity.noteTitle }}"</i></p>
+                <span class="activity-time">{{ activity.timestamp | date:'mediumTime' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </ng-container>
+
+  <!-- Edit Modal Overlay -->
+  <div *ngIf="editingNote" class="modal-overlay">
+    <div class="modal-card glass slide-in">
+      <h2>Edit Note</h2>
+      <form (ngSubmit)="saveEdit()" #editForm="ngForm">
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" name="editTitle" [(ngModel)]="editingNote.title" required>
+        </div>
+        <div class="form-group">
+          <label>Content</label>
+          <textarea name="editContent" [(ngModel)]="editingNote.content" required></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="cancelEdit()">Cancel</button>
+          <button type="submit" class="btn-primary" [disabled]="!editForm.form.valid">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
